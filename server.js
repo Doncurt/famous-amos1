@@ -14,13 +14,25 @@ const index = require('./routes/index');
 const pets = require('./routes/pets');
 const comments = require('./routes/comments');
 const purchases = require('./routes/purchases');
+const flash = require('express-flash');
+const session = require('express-session');
 
 const app = express();
 
+//express flash
+app.use(cookieParser('keyboard cat'));
+app.use(session({ cookie: { maxAge: 60000 }}));
+app.use(flash());;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
-
+// DB set-up
+// DB set-up
+// DB set-up
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize('famous-amos-development', 'postgres', 'password', {
+    dialect: 'postgres'
+});
 // override with POST having ?_method=DELETE or ?_method=PUT
 app.use(methodOverride('_method'))
 
@@ -30,7 +42,8 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')))
+
 
 app.use('/', index);
 app.use('/pets', pets);
@@ -44,6 +57,14 @@ app.use((req, res, next) => {
   next(err);
 });
 
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 // error handler
 app.use((err, req, res, next) => {
   // set locals, only providing error in development
