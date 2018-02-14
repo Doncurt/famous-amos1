@@ -8,6 +8,45 @@ const model = require('../db/models/');
 const Pet = require('../db/models/');
 
 
+// UPLOADING TO AWS S3
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/' })
+var Upload = require('s3-uploader');
+
+var client = new Upload(process.env.S3_BUCKET, {
+  aws: {
+    path: 'posts/coverImg/',
+    region: process.env.S3_REGION,
+    acl: 'public-read',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  },
+  cleanup: {
+    versions: true,
+    original: true
+  },
+  versions: [{
+    maxWidth: 320,
+    aspect: '1.618:1',
+    suffix: '-thumbnail'
+  },{
+    maxWidth: 1000,
+    aspect: '2.414:1', //silver ratio
+    suffix: '-desktop'
+  },{
+    maxWidth: 320,
+    aspect: '2.414:1', //silver ratio
+    suffix: '-mobile'
+  },{
+    maxWidth: 100,
+    aspect: '1:1',
+    suffix: '-square'
+  }]
+});
+
+
+
+
 router.get('/search', (req, res) => {
     let limit = 3;   // number of records per page
     let offset = 0;
@@ -71,10 +110,11 @@ router.get('/:petId', (req, res) => {
 });
 
 // CREATE
-router.post('/', (req, res) => {
+router.post('/', upload.single('picUrl'), (req, res) => {
     model.Pet.create(req.body);
     res.redirect('/');
 });
+
 
 // EDIT
 router.get('/:petId/edit', (req, res) => {
