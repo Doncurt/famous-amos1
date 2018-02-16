@@ -3,14 +3,14 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
       queryInterface.addColumn(
-        'Comments',
-        'PetId',
+        'Pets',
+        'UserId',
         Sequelize.INTEGER
       )
 
   },
 
   down: (queryInterface, Sequelize) => {
-    queryInterface.addColumn('Comments', 'PetId')
+    queryInterface.addColumn('Pets', 'UserId')
   }
 };

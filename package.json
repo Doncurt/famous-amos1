@@ -24,6 +24,7 @@
     "s3-uploader": "^2.0.3",
     "sequelize": "^4.33.3",
     "serve-favicon": "~2.4.5",
+    "socket.io": "^2.0.4",
     "stripe": "^5.4.0"
   }
 }

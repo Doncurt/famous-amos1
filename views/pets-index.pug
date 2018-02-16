@@ -7,10 +7,10 @@ block content
     each pet, index in pets
       .col-sm-4.justify-content-center
         .card
-          img.card-img-top(src=pet.picUrl, alt='Card image cap')
+          img.card-img-top(src=pet.picUrlSq, alt='Card image cap')
           .card-body
             h4.card-title= pet.name
             small.text-muted= pet.species
             p.card-text= pet.description
             .text-right
-                a.card-link(href="/pets/" + index) View #{pet.name}
+                a.card-link(href="/pets/" + pet.id) View #{pet.name}

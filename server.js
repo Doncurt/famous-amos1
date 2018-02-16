@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 // AWS set up
 
+const Upload = require('s3-uploader');
 
 app.use('/', index);
 app.use('/pets', pets);

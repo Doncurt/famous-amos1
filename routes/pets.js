@@ -9,13 +9,29 @@ const Pet = require('../db/models/');
 
 
 // UPLOADING TO AWS S3
-var multer  = require('multer')
-var upload = multer({ dest: 'uploads/' })
-var Upload = require('s3-uploader');
+const multer  = require('multer');
+//sets up the multur storage for uploads locally
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+      // TODO Look into edge cases
+      let extArray = file.mimetype.split("/");
+      let ext = extArray[extArray.length - 1];
+      cb(null, Date.now() + "." + ext);
+  }
+});
+
+//multer grabs the storage
+const upload = multer({ storage });
+const Upload = require('s3-uploader');
+//client started for s3 that handles the initialization for the S3_BUCKET and immige types
+
 
 var client = new Upload(process.env.S3_BUCKET, {
   aws: {
-    path: 'posts/coverImg/',
+    path: 'pets/coverImg/',
     region: process.env.S3_REGION,
     acl: 'public-read',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -111,10 +127,31 @@ router.get('/:petId', (req, res) => {
 
 // CREATE
 router.post('/', upload.single('picUrl'), (req, res) => {
-    model.Pet.create(req.body);
-    res.redirect('/');
-});
+  //declare newpet as the input you recieved from the form in the new-pets routes
+    let newPet = req.body;
+    //if there is a file retrieved from the  req.body..
+    if (req.file) {
+      client.upload(req.file.path, {}, function (err, versions, meta) {
+        if (err) {
+            console.log(err);
+            return res.status(400).send({ err: err });
+        }
+        // if all goes wwell create a new pet and colsole log
+        model.Pet.create(newPet).then(() => {
+            console.log(newPet)
+            res.redirect('/');
+        });
+    });
 
+    }
+    //will retcon this and put an actual error message later
+    else{
+        model.Pet.create(newPet).then(() => {
+            res.redirect('/');
+        });
+    }
+
+});
 
 // EDIT
 router.get('/:petId/edit', (req, res) => {

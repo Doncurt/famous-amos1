@@ -9,10 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     picUrlSq: DataTypes.STRING,
     description: DataTypes.TEXT
   });
+
   Pet.associate = function(models){
     Pet.hasMany(models.Comment);
    Pet.belongsTo(models.User);
 
-};
+  };
   return Pet;
 };
