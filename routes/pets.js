@@ -63,47 +63,6 @@ var client = new Upload(process.env.S3_BUCKET, {
 
 
 
-router.get('/search', (req, res) => {
-    let limit = 3;   // number of records per page
-    let offset = 0;
-    let termQuery = {};
-
-    if(req.query.term) {
-        termQuery = {
-            $or: [ { name: { $iLike: "%" + req.query.term + "%" } },
-			       { species: { $iLike: "%" + req.query.term + "%" } },
-                   { description: { $iLike: "%" + req.query.term + "%" } },
-                ]
-            };
-    }
-
-    model.Pet.findAndCountAll({where: termQuery}).then((data) => {
-      let page = req.query.page;      // page number
-      let pages = Math.ceil(data.count / limit);
-      offset = limit * (page - 1);
-
-      model.Pet.findAll({
-        where: termQuery,
-        limit: limit,
-        offset: offset,
-        $sort: { id: 1 }
-      }).then((pets) => {
-          res.render('pets-index', {pets, count: data.count, term: req.query.term, pages});
-      });
-    })
-    .catch(function (error) {
-  		res.status(500).send('Internal Server Error');
-  	});
-
-});
-
-// INDEX
-router.get('/', (req, res) => {
-  //Uses PET model to  find all the pet uobjects then posts
-    Pet.findAll().then(pets =>
-      {res.send(pets) });
-
-});
 // NEW
 router.get('/new', (req, res) => {
   req.flash('info', 'Flash message ');
@@ -126,31 +85,12 @@ router.get('/:petId', (req, res) => {
 });
 
 // CREATE
-router.post('/', upload.single('picUrl'), (req, res) => {
-  //declare newpet as the input you recieved from the form in the new-pets routes
-    let newPet = req.body;
-    //if there is a file retrieved from the  req.body..
-    if (req.file) {
-      client.upload(req.file.path, {}, function (err, versions, meta) {
-        if (err) {
-            console.log(err);
-            return res.status(400).send({ err: err });
-        }
-        // if all goes wwell create a new pet and colsole log
-        model.Pet.create(newPet).then(() => {
-            console.log(newPet)
-            res.redirect('/');
-        });
-    });
-
-    }
-    //will retcon this and put an actual error message later
-    else{
-        model.Pet.create(newPet).then(() => {
-            res.redirect('/');
-        });
-    }
-
+router.post('/', (req, res) => {
+    model.Pet.create(req.body).then(() => {
+      console.log(req.body);
+        req.flash('success', 'Successfully Created pets')
+        res.redirect('/');
+    })
 });
 
 // EDIT
@@ -174,7 +114,12 @@ router.put('/:petId', (req, res) => {
 
 // DESTROY
 router.delete('/:petId', (req, res) => {
-  res.redirect('/');
+  model.Pet.findById(req.params.petId).then(pet => {
+      return pet.destroy();
+  }).then(() => {
+      res.redirect('/');
+  }).catch((err) => {
+      res.send(err);
+  });
 });
-
 module.exports = router;

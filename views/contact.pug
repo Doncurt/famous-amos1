@@ -1,0 +1,19 @@
+extends layout
+
+block content
+
+
+    .row.justify-content-center
+        .col-sm-6
+            legend Contact US
+            form(form action="/contact" method="Post" id=contactform)
+                .form-group
+                    label Name
+                    input.form-control(name="name")
+                .form-group
+                    label Email
+                    input.form-control(name="email")
+                .form-group
+                    label How can we help?
+                    textarea.form-control(name="text")
+                button(type="submit").btn.btn-primary Send

@@ -14,11 +14,13 @@ const index = require('./routes/index');
 const pets = require('./routes/pets');
 const comments = require('./routes/comments');
 const purchases = require('./routes/purchases');
+
 const flash = require('express-flash');
 const session = require('express-session');
 
 const app = express();
-
+const paginate = require('express-paginate');
+app.use(paginate.middleware(4, 50));
 //express flash
 app.use(cookieParser('keyboard cat'));
 app.use(session({ cookie: { maxAge: 60000 }}));
@@ -28,6 +30,15 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 // DB set-up
 // DB set-up
+// Postgres - Heroku
+const { Client } = require('pg');
+
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true,
+});
+
+client.connect();
 // DB set-up
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize('famous-amos-development', 'postgres', 'password', {

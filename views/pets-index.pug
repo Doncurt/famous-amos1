@@ -1,10 +1,15 @@
 extends layout
 
 block content
-
-
   .row
-    each pet, index in pets
+    form(action="/" method="GET")
+        div.btn-group.my-4(role="group")
+            if search
+                input(type="hidden" name="search" value=search)
+            - for (var x = 1; x < pages+1; x++)
+                input.pageBtn(type="submit" name="page" value=x)
+  .row
+    each pet in pets
       .col-sm-4.justify-content-center
         .card
           img.card-img-top(src=pet.picUrlSq, alt='Card image cap')

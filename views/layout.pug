@@ -13,11 +13,27 @@ html
         span.navbar-toggler-icon
       #navbarSupportedContent.collapse.navbar-collapse
         ul.navbar-nav
+            form(method="GET" action="/search")
+                input(type="text" name="name" value="" placeholder="Pet Name")
+                button(type="submit") Search
+
+        ul.navbar-nav
           li.nav-item
             a.nav-link(href='/pets/new') New Pet
 
 
+    if messages.info
+        div.alert.alert-info
+            span=messages.info
 
+    if messages.caution
+        div.alert.alert-caution
+            span=messages.caution
+
+    if messages.success
+        div.alert.alert-success
+            span=messages.success
+            
     .container
       block content
 

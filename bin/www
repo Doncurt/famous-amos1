@@ -26,15 +26,18 @@ var server = http.createServer(app);
  */
 
  //SOCKET IO
+ //MUST BE UNDER THE SERVER OR IT WILL CUASE ISSUES WITH THE PORT
  const io = require('socket.io')(server);
-
+// OPEN a connection with on function
 io.on('connection', function (socket) {
-    let statusArray = ["Bathing", "Snoozing", "Werking", "Playing"];
-
+    //Array of cat statuses
+    var PetStatus = ["Bathing","Judges you in Spanish","Cries in Korean","Stares in Japanese", "Werking", "Playing","Crying"];
+    //Interval functions that randomizes the array of status strings
     setInterval(function(){
-        let randomNum = Math.floor(Math.random() * 4);
-        socket.emit('status', { status: statusArray[randomNum]});
-    }, 10000);
+        var randVal = Math.floor(Math.random() * 6);
+
+        socket.emit('status', { status: PetStatus[randVal]});
+    }, 5000);
 });
 
 
